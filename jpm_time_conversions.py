@@ -1,3 +1,5 @@
+import numpy as np
+
 __author__ = "James Paul Mason"
 __contact__ = "jmason86@gmail.com"
 
@@ -20,6 +22,8 @@ def sod_to_hhmmss(sod):
     Example:
         hhmmss = sod_to_hhmmss(sod)
     """
+
+    # Parse seconds of day into hours, minutes, and seconds
     time = sod % (24 * 3600)
     hours = time // 3600
     time %= 3600
@@ -27,25 +31,17 @@ def sod_to_hhmmss(sod):
     time %= 60
     seconds = time
 
-    hour_str = []
-    for hour in hours:
-        if hour < 10:
-            hour_str.append('0' + str(int(hour)))
-        else:
-            hour_str.append(str(int(hour)))
+    # Convert to string type and add leading zeros
+    hours_str = hours.astype(str)
+    small_hour_indices = hours < 10
+    hours_str[small_hour_indices] = np.core.defchararray.zfill(hours_str[small_hour_indices], 2)
 
-    minute_str = []
-    for minute in minutes:
-        if minute < 10:
-            minute_str.append('0' + str(int(minute)))
-        else:
-            minute_str.append(str(int(minute)))
+    minutes_str = minutes.astype(str)
+    small_minute_indices = minutes < 10
+    minutes_str[small_minute_indices] = np.core.defchararray.zfill(minutes_str[small_minute_indices], 2)
 
-    second_str = []
-    for second in seconds:
-        if second < 10:
-            second_str.append('0' + str(int(second)))
-        else:
-            second_str.append(str(int(second)))
+    seconds_str = seconds.astype(str)
+    small_second_indices = seconds < 10
+    seconds_str[small_second_indices] = np.core.defchararray.zfill(seconds_str[small_second_indices], 2)
 
-    return hour_str + ':' + minute_str + ':' + second_str
+    return np.char.array(hours_str) + ':' + np.char.array(minutes_str) + ':' + np.char.array(seconds_str)
