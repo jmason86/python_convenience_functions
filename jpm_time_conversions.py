@@ -14,7 +14,7 @@ def sod_to_hhmmss(sod):
         None
 
     Outputs:
-        hhmmss [list]: List of strings of the form 'hh:mm:ss'
+        hhmmss [np chararray]: Array of strings of the form 'hh:mm:ss'
 
     Optional Outputs:
         None
@@ -25,6 +25,7 @@ def sod_to_hhmmss(sod):
 
     # Parse seconds of day into hours, minutes, and seconds
     time = sod % (24 * 3600)
+    time = time.astype(int)
     hours = time // 3600
     time %= 3600
     minutes = time // 60
