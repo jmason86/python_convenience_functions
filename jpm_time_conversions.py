@@ -1,5 +1,6 @@
 import numpy as np
 import datetime
+import pandas as pd
 
 __author__ = "James Paul Mason"
 __contact__ = "jmason86@gmail.com"
@@ -75,3 +76,73 @@ def yyyydoy_to_datetime(yyyydoy):
     return np.array([datetime.datetime(int(parsed_date[1][i]), 1, 1) +           # base year (yyyy-01-01)
                      datetime.timedelta(days=int(parsed_date[0][i] * 1000) - 1)  # doy -> mm-dd
                      for i in range(len(yyyydoy))])                              # loop over input array
+
+
+def yyyydoy_sod_to_datetime(yyyydoy, sod):
+    """Convert yyyydoy, sod (e.g., 2017013, 86395) to datetime (e.g., datetime.datetime(2017, 1, 13, 23, 59, 55)).
+
+    Inputs:
+        yyyydoy [np.array]: The array of dates to convert.
+        sod [np.array]:     The array of seconds of day to convert.
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        dt_array [np.array]: Array of datetimes.
+
+    Optional Outputs:
+        None.
+
+    Example:
+        dt_array = yyyydoy_sod_to_datetime(yyyydoy, sod)
+    """
+
+    # Parse year and doy
+    parsed_date = np.modf(yyyydoy / 1000)  # Divide to get yyyy.doy
+
+    # Convert sod to hhmmss
+    hhmmss = sod_to_hhmmss(sod)
+
+    return np.array([datetime.datetime(int(parsed_date[1][i]), 1, 1,
+                     int(hhmmss[i][:2]),
+                     int(hhmmss[i][3:5]),
+                     int(hhmmss[i][6:8])) +                                      # base (yyyy-01-01 hh:mm:ss)
+                     datetime.timedelta(days=int(parsed_date[0][i] * 1000) - 1)  # doy -> mm-dd
+                     for i in range(len(yyyydoy))])                              # loop over input array
+
+
+def metatime_to_seconds_since_start(metatimes):
+    """Convert metatime array to seconds since first datetime in array.
+
+    Inputs:
+        metatimes [np.array or pd.DatetimeIndex]: Array of metatimes.
+                                                  metatimes are either:
+                                                  np.array of datetime.datetime,
+                                                  np.array of numpy.datetime64,
+                                                  np.array of pd.Timestamp,
+                                                  pd.DatetimeIndex.
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        seconds_since_start [np.array]: Array of long integers
+                                        indicating number of secondsd since the first datetime in the arrray.
+
+    Optional Outputs:
+        None.
+
+    Example:
+        seconds_since_start = metatime_to_seconds_since_start(metatimes)
+    """
+
+    # Check type of input and do conversion accordingly
+    if isinstance(metatimes[0], datetime.datetime):
+        dt_since_start = metatimes - metatimes[0]
+        return np.array([np.long(metatime.total_seconds())
+                        for metatime in dt_since_start])
+    elif isinstance(metatimes[0], np.datetime64 or pd.Timestamp):
+        npdts_since_start = metatimes - metatimes[0]
+        return np.array([np.long(npdt_since_start / np.timedelta64(1, 's'))
+                        for npdt_since_start in npdts_since_start])
