@@ -112,14 +112,14 @@ def yyyydoy_sod_to_datetime(yyyydoy, sod):
                      for i in range(len(yyyydoy))])                              # loop over input array
 
 
-def metatime_to_seconds_since_start(metatimes):
+def metatimes_to_seconds_since_start(metatimes):
     """Convert metatime array to seconds since first datetime in array.
 
     Inputs:
         metatimes [np.array or pd.DatetimeIndex]: Array of metatimes.
                                                   metatimes are either:
                                                   np.array of datetime.datetime,
-                                                  np.array of numpy.datetime64,
+                                                  np.array of np.datetime64,
                                                   np.array of pd.Timestamp,
                                                   pd.DatetimeIndex.
 
@@ -128,13 +128,13 @@ def metatime_to_seconds_since_start(metatimes):
 
     Outputs:
         seconds_since_start [np.array]: Array of long integers
-                                        indicating number of secondsd since the first datetime in the arrray.
+                                        indicating number of seconds since the first time in the arrray.
 
     Optional Outputs:
         None.
 
     Example:
-        seconds_since_start = metatime_to_seconds_since_start(metatimes)
+        seconds_since_start = metatimes_to_seconds_since_start(metatimes)
     """
 
     # Check type of input and do conversion accordingly
@@ -146,3 +146,44 @@ def metatime_to_seconds_since_start(metatimes):
         npdts_since_start = metatimes - metatimes[0]
         return np.array([np.long(npdt_since_start / np.timedelta64(1, 's'))
                         for npdt_since_start in npdts_since_start])
+
+
+def seconds_since_start_to_metatimes(seconds_since_start, start_metatime):
+    """Convert seconds since start to metatime with type identical to start_metatime.
+
+    Inputs:
+        seconds_since_start [np.array]: Array of long integers
+                                        indicating number of seconds since the first time in the arrray.
+        start_metatime [metatime]:      Starting time. Not an np.array, but otherwise follows the
+                                        same available formats for metatime (see metatimes output description).
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        metatimes [np.array or pd.DatetimeIndex]: Array of times in the same format as start_metatime.
+                                                  metatimes are either:
+                                                  np.array of datetime.datetime,
+                                                  np.array of np.datetime64,
+                                                  np.array of pd.Timestamp,
+                                                  pd.DatetimeIndex.
+
+    Optional Outputs:
+        None.
+
+    Example:
+        datetimeindex = seconds_since_start_to_metatimes(seconds_since_start, dt.datetime(2017, 5, 3, 13, 45, 49))
+    """
+
+    # Check type optional input and do conversion accordingly
+    if isinstance(start_metatime, datetime.datetime):
+        return np.array([start_metatime + datetime.timedelta(seconds=int(second_since_start))
+                        for second_since_start in seconds_since_start])
+    elif isinstance(start_metatime, np.datetime64):
+        return np.array([start_metatime + np.timedelta64(int(second_since_start), 's')
+                        for second_since_start in seconds_since_start])
+    elif isinstance(start_metatime, pd.Timestamp):
+        return np.array([pd.Timestamp(start_metatime + datetime.timedelta(seconds=int(second_since_start)))
+                        for second_since_start in seconds_since_start])
+    elif isinstance(start_metatime, pd.DatetimeIndex):
+        return pd.DatetimeIndex(seconds_since_start_to_metatimes(seconds_since_start, start_metatime.values[0]))
