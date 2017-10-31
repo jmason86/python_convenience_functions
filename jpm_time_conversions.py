@@ -187,3 +187,45 @@ def seconds_since_start_to_metatimes(seconds_since_start, start_metatime):
                         for second_since_start in seconds_since_start])
     elif isinstance(start_metatime, pd.DatetimeIndex):
         return pd.DatetimeIndex(seconds_since_start_to_metatimes(seconds_since_start, start_metatime.values[0]))
+
+
+def datetimeindex_to_iso(datetimeindex):
+    """Convert pandas DatatimeIndex to an ISO string.
+
+    Inputs:
+        DatetimeIndex [pd.DatetimeIndex]: A pandas DatetimeIndex to be converted.
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        iso [np.array]: Array of string format ISO times.
+
+    Optional Outputs:
+        None.
+
+    Example:
+        iso = datetimeindex_to_iso(df.index)
+    """
+    return datetimeindex.strftime('%Y-%m-%dT%H:%m:%SZ')
+
+
+def datetimeindex_to_human(datetimeindex):
+    """Convert pandas DatatimeIndex to an ISO string with the T and Z removed (yyyy-mm-dd hh:mm:ss).
+
+    Inputs:
+        DatetimeIndex [pd.DatetimeIndex]: A pandas DatetimeIndex to be converted.
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        human [np.array]: Array of string format ISO times with the T and Z removed (yyyy-mm-dd hh:mm:ss).
+
+    Optional Outputs:
+        None.
+
+    Example:
+        iso = datetimeindex_to_iso(df.index)
+    """
+    return datetimeindex.strftime('%Y-%m-%d %H:%m:%S')
