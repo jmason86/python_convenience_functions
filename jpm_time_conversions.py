@@ -148,6 +148,44 @@ def metatimes_to_seconds_since_start(metatimes):
                         for npdt_since_start in npdts_since_start])
 
 
+def metatimes_to_human(metatimes):
+    """Convert metatime array to an ISO string with the T and Z removed (yyyy-mm-dd hh:mm:ss).
+
+    Inputs:
+        metatimes [np.array or pd.DatetimeIndex]: Array of metatimes.
+                                                  metatimes are either:
+                                                  np.array of datetime.datetime,
+                                                  np.array of np.datetime64,
+                                                  np.array of pd.Timestamp,
+                                                  pd.DatetimeIndex.
+
+    Optional Inputs:
+        None.
+
+    Outputs:
+        times_human [np.array]: Array of string format ISO times with the T and Z removed (yyyy-mm-dd hh:mm:ss).
+
+    Optional Outputs:
+        None.
+
+    Example:
+        times_human = metatimes_to_human(metatimes)
+    """
+
+    # Check type of input and do conversion accordingly
+    if isinstance(metatimes[0], datetime.datetime):
+        return np.array([metatime.strftime('%Y-%m-%d %H:%M:%S')
+                        for metatime in metatimes])
+    elif isinstance(metatimes[0], np.datetime64):
+        return np.array([metatime.astype(str)
+                        for metatime in metatimes])
+    elif isinstance(metatimes[0], pd.Timestamp):
+        return np.array([metatime.to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')
+                        for metatime in metatimes])
+    elif isinstance(metatimes[0], str):
+        return metatimes
+
+
 def seconds_since_start_to_metatimes(seconds_since_start, start_metatime):
     """Convert seconds since start to metatime with type identical to start_metatime.
 
@@ -220,12 +258,12 @@ def datetimeindex_to_human(datetimeindex):
         None.
 
     Outputs:
-        human [np.array]: Array of string format ISO times with the T and Z removed (yyyy-mm-dd hh:mm:ss).
+        times_human [np.array]: Array of string format ISO times with the T and Z removed (yyyy-mm-dd hh:mm:ss).
 
     Optional Outputs:
         None.
 
     Example:
-        iso = datetimeindex_to_iso(df.index)
+        times_human = datetimeindex_to_human(df.index)
     """
     return datetimeindex.strftime('%Y-%m-%d %H:%m:%S')
