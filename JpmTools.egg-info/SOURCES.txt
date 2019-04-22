@@ -1,0 +1,6 @@
+README.md
+setup.py
+JpmTools.egg-info/PKG-INFO
+JpmTools.egg-info/SOURCES.txt
+JpmTools.egg-info/dependency_links.txt
+JpmTools.egg-info/top_level.txt
