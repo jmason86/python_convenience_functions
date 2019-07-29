@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def lat_lon_to_position_angle(latitude, longitude):
     """Function to translate heliocentric coordinates (latitude, longitude) into position angle
     Written by Alysha Reinard and James Paul Mason.
@@ -23,7 +24,7 @@ def lat_lon_to_position_angle(latitude, longitude):
     x = longitude * 1.0
     y = latitude * 1.0
     if y != 0:
-        pa = np.arctan(-x / y)
+        pa = np.arctan(-np.sin(x) / np.tan(y))
     else:
         pa = 3.1415926 / 2.  # limit of arctan(infinity)
 
